@@ -80,6 +80,8 @@ int main(int argc, char **argv) {
 
 	int sockfd = create_socket(ip, port);
 
+	char password[256];
+	fgets(password, 256, stdin);
 
 
 	close_socket(sockfd);

@@ -101,6 +101,24 @@ char *encrypt_file(char *filename, char *password) {
 	return filename_enc;
 }
 
+void send_file(int sockfd, char *file) {
+	/* send the Base64-encoded filename */
+	write(sockfd, file, 13);
+
+	FILE *fp = fopen(file, "r");
+
+	char buffer[1024];
+	int buffer_len = 0;
+
+	while (!feof(fp)) {
+		buffer_len = fread(buffer, 1, 1024, fp);
+
+		write(sockfd, buffer, buffer_len);
+	}
+
+	fclose(fp);
+}
+
 int create_socket(char *ip, int port) {
 	int sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -173,6 +191,8 @@ int main(int argc, char **argv) {
 	fgets(password, 256, stdin);
 
 	char *file_enc = encrypt_file(file, password);
+
+	send_file(sockfd, file_enc);
 
 	close_socket(sockfd);
 	return 0;

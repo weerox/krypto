@@ -10,6 +10,24 @@
 // according to the IANA Port Number Registry
 #define DEFAULT_PORT 31415
 
+void recv_file(int sockfd) {
+	/* read the Base64-encoded filename */
+	char *file = malloc(13);
+	read(sockfd, file, 13);
+
+	FILE *fp = fopen(file, "w");
+
+	char buffer[1024];
+	int buffer_len = 0;
+
+	while ((buffer_len = read(sockfd, buffer, 1024)) > 0) {
+fwrite(buffer, 1, buffer_len, stdout);
+		fwrite(buffer, 1, buffer_len, fp);
+	}
+
+	fclose(fp);
+}
+
 int create_socket(int port) {
 	int sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -79,6 +97,8 @@ int main(int argc, char **argv) {
 	}
 
 	int sockfd = create_socket(port);
+
+	recv_file(sockfd);
 
 	close_socket(sockfd);
 	return 0;

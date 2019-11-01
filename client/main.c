@@ -13,6 +13,36 @@
 #define DEFAULT_PORT 31415
 #define DEFAULT_IP "127.0.0.1"
 
+int create_socket(char *ip, int port) {
+	int sockfd = socket(PF_INET, SOCK_STREAM, 0);
+
+	if (sockfd == -1) {
+		fprintf(stderr, "Couldn't create socket\n");
+		return 1;
+	}
+
+	struct sockaddr_in address;
+
+	address.sin_family = AF_INET;
+	address.sin_port = htons(port);
+
+	if (inet_aton(ip, &address.sin_addr) == 0) {
+		fprintf(stderr, "Couldn't parse the supplied address\n");
+		return 1;
+	}
+
+	if (connect(sockfd, (struct sockaddr *) &address, sizeof(address))) {
+		fprintf(stderr, "Couldn't create a connection on the socket\n");
+		return 1;
+	}
+
+	return sockfd;
+}
+
+void close_socket(int sockfd) {
+	close(sockfd);
+}
+
 void usage() {
 	fprintf(stderr, "usage: krypto [-p <port>] [-i <address>] <file>\n");
 	fprintf(stderr, "\n");
@@ -48,28 +78,10 @@ int main(int argc, char **argv) {
 
 	char *file = *(argv + optind);
 
-	int sockfd = socket(PF_INET, SOCK_STREAM, 0);
+	int sockfd = create_socket(ip, port);
 
-	if (sockfd == -1) {
-		fprintf(stderr, "Couldn't create socket\n");
-		return 1;
-	}
 
-	struct sockaddr_in address;
 
-	address.sin_family = AF_INET;
-	address.sin_port = htons(port);
-
-	if (inet_aton("127.0.0.1", &address.sin_addr) == 0) {
-		fprintf(stderr, "Couldn't parse the supplied address\n");
-		return 1;
-	}
-
-	if (connect(sockfd, (struct sockaddr *) &address, sizeof(address))) {
-		fprintf(stderr, "Couldn't create a connection on the socket\n");
-		return 1;
-	}
-
-	close(sockfd);
+	close_socket(sockfd);
 	return 0;
 }

@@ -10,30 +10,7 @@
 // according to the IANA Port Number Registry
 #define DEFAULT_PORT 31415
 
-void usage() {
-	fprintf(stderr, "usage: krypto [-p <port>]\n");
-	fprintf(stderr, "\n");
-}
-
-int main(int argc, char **argv) {
-	char c;
-
-	int port = DEFAULT_PORT;
-
-	// getopt shouldn't print errors
-	opterr = 0;
-
-	while ((c = getopt(argc, argv, "p:")) != -1) {
-		switch (c) {
-			case 'p':
-				port = atoi(optarg);
-				break;
-			default:
-				usage();
-				return 1;
-		}
-	}
-
+int create_socket(int port) {
 	int sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
 	if (sockfd == -1) {
@@ -69,5 +46,40 @@ int main(int argc, char **argv) {
 	}
 
 	close(sockfd);
+
+	return accepted_socket;
+}
+
+void close_socket(int sockfd) {
+	close(sockfd);
+}
+
+void usage() {
+	fprintf(stderr, "usage: krypto [-p <port>]\n");
+	fprintf(stderr, "\n");
+}
+
+int main(int argc, char **argv) {
+	char c;
+
+	int port = DEFAULT_PORT;
+
+	// getopt shouldn't print errors
+	opterr = 0;
+
+	while ((c = getopt(argc, argv, "p:")) != -1) {
+		switch (c) {
+			case 'p':
+				port = atoi(optarg);
+				break;
+			default:
+				usage();
+				return 1;
+		}
+	}
+
+	int sockfd = create_socket(port);
+
+	close_socket(sockfd);
 	return 0;
 }

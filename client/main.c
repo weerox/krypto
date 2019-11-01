@@ -194,6 +194,9 @@ int main(int argc, char **argv) {
 
 	send_file(sockfd, file_enc);
 
+	// remove the encoded file stored which was temporarily stored
+	remove(file_enc);
+
 	close_socket(sockfd);
 	return 0;
 }

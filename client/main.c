@@ -168,6 +168,7 @@ int main(int argc, char **argv) {
 
 	int sockfd = create_socket(ip, port);
 
+	printf("Password: ");
 	char password[256];
 	fgets(password, 256, stdin);
 
